@@ -1,11 +1,36 @@
 <?php
 
+use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+/*
+|--------------------------------------------------------------------------
+| Public Survey Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::controller(SurveyController::class)->group(function () {
+
+    Route::get('/', 'landing')->name('landing');
+
+    Route::post('/survey/start', 'start')->name('survey.start');
+
+    Route::get('/survey/{attempt}/question/{index}', 'question')
+        ->name('survey.question');
+
+    Route::post('/survey/{attempt}/answer', 'saveAnswer')
+        ->name('survey.answer');
+
+    Route::get('/survey/{attempt}/result', 'result')
+        ->name('survey.result');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Auth Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/dashboard', function () {
     return view('dashboard');

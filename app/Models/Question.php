@@ -9,17 +9,17 @@ class Question extends Model
     protected $fillable = [
         'topic_id',
         'question',
-        'sequence'
+        'sequence',
     ];
 
-    public function topic(){
+    public function topic()
+    {
         return $this->belongsTo(Topic::class);
     }
 
-    public function answer(){
+    public function answers()
+    {
         return $this->hasMany(Answer::class)
-        ->orderBy('sequence');
+            ->orderBy('sequence');
     }
-
-
 }
