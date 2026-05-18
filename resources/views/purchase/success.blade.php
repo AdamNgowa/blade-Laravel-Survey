@@ -11,7 +11,7 @@
 
     <p>Quantity: {{$purchase->quantity}}</p>
     <p>Amount: {{number_format($purchase->amount)}}</p>
-    
+    <p>Status: {{$purchase->status}}</p>
     
 </body>
 </html>

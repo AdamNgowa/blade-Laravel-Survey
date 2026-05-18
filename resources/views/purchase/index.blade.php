@@ -10,10 +10,15 @@
     <form action="{{ route('purchase.checkout') }}" method="post">
         @csrf
         <label >Number of access codes</label>
-        <input type="number" name="quantity" min="1" max="100" required>
+        <input 
+            type="number" 
+            name="quantity" 
+            min="1" 
+            max="100" 
+            required>
 
         <button type="submit">
-            Continue to payment
+            Pay with Paypal
         </button>
 
     </form>

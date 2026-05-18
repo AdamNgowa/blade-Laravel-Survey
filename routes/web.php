@@ -47,7 +47,10 @@ Route::middleware('auth')->controller(PurchaseController::class)->group(function
     Route::get('/purchase','index')->name('purchase.index');
     Route::post('purchase/checkout','checkout')->name('purchase.checkout');
     Route::get('/purchase/success/{purchase}','success')->name('puchase.success');
+    Route::get('/paypal/cancel','cancel')->name('paypla.cancel');
     
 });
+
+
 
 require __DIR__.'/auth.php';
