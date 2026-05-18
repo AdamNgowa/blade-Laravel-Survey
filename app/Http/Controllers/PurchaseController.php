@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Purchase;
+use App\services\AccessCodeService;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
 
@@ -64,38 +65,57 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function success(Request $request, PayPalService $paypal)
-    {
-        $orderId = $request->token;
+    public function success(
+    Request $request,
+    PayPalService $paypal,
+    AccessCodeService $codeService
+) {
 
-        $capture = $paypal->capturePayment($orderId);
+    $orderId = $request->token;
+    $capture = $paypal->capturePayment($orderId);
+    $purchase = Purchase::where('paypal_order_id', $orderId)
+        ->firstOrFail();
 
-        $purchase = Purchase::where('paypal_order_id', $orderId)
-            ->firstOrFail();
+    /*
+    Prevent duplicate generation
+    */
 
-        if (($capture['status'] ?? null) === 'COMPLETED') {
+    if ($purchase->status === 'paid') {
 
-            $purchase->update([
-                'status' => 'paid'
-            ]);
+        return view('purchase.success', [
+            'purchase' => $purchase,
+            'codes' => $purchase->accessCodes
+        ]);
+    }
 
-            /*
-            NEXT:
-            Generate access codes
-            */
-
-            return view('purchase.success', compact('purchase'));
-        }
+    if (($capture['status'] ?? null) === 'COMPLETED') {
 
         $purchase->update([
-            'status' => 'failed'
+            'status' => 'paid'
         ]);
 
-        return redirect()->route('purchase.index')
-            ->withErrors([
-                'payment' => 'Payment failed.'
-            ]);
+        $codes = $codeService->generate($purchase);
+
+        /*
+        NEXT:
+        Send Email
+        */
+
+        return view('purchase.success', [
+            'purchase' => $purchase,
+            'codes' => $codes
+        ]);
     }
+
+    $purchase->update([
+        'status' => 'failed'
+    ]);
+
+    return redirect()->route('purchase.index')
+        ->withErrors([
+            'payment' => 'Payment failed.'
+        ]);
+}
 
     public function cancel()
     {

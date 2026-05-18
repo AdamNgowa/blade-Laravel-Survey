@@ -12,6 +12,16 @@
     <p>Quantity: {{$purchase->quantity}}</p>
     <p>Amount: {{number_format($purchase->amount)}}</p>
     <p>Status: {{$purchase->status}}</p>
+
+    <h2>Here are your access codes</h2>
+    @foreach ($codes as $code )
+        <div>
+            <strong>
+               {{ $code->code}}
+            </strong>
+        </div>
+        
+    @endforeach
     
 </body>
 </html>
