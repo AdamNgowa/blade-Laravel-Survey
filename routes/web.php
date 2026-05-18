@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware('auth')->controller(PurchaseController::class)->group(function (){
+    Route::get('/purchase','index')->name('purchase.index');
+    Route::post('purchase/checkout','checkout')->name('purchase.checkout');
+    Route::get('/purchase/success/{purchase}','success')->name('puchase.success');
+    
 });
 
 require __DIR__.'/auth.php';
