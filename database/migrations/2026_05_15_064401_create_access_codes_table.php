@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('access_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('access_code_order_id')
+            $table->foreignId('purchase_id')
+            ->nullable()
             ->constrained()
-            ->cascadeOnDelete();
+            ->nullOnDelete();
             $table->string('code')->unique();
             $table->boolean('is_used')->default(false);
             $table->timestamp('used_at')->nullable();
-            $table->foreignId('used_by')->constrained('users');
+            $table->foreignId('used_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -11,7 +11,13 @@
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
                 </div>
+                
             </div>
+            <div class="p-2 bg-gray-500 mt-2 rounded-md">
+                    <a href={{ route('landing') }}>
+                        Start survey
+                    </a>
+                </div>
         </div>
     </div>
 </x-app-layout>

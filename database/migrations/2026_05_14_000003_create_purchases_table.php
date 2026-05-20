@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')
             ->constrained()
             ->cascadeOnDelete();
-            $table->integer('quantitiy');
+            $table->integer('quantity');
             $table->decimal('amount',10,2);
             $table->string('paypal_order_id')->nullable();
             $table->enum('status',[

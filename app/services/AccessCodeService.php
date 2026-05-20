@@ -11,7 +11,7 @@ class AccessCodeService
     // This is where we generate the codes
     public function generate(Purchase $purchase){
         $codes  =[];
-        for($i = 0;$i< $purchase->quantitiy;$i++){
+        for($i = 0;$i< $purchase->quantity;$i++){
             do{
                 $code = strtoupper(Str::random(10));
             } while(

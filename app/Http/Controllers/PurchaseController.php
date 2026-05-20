@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PurchaseSuccessMail;
 use App\Models\Purchase;
 use App\services\AccessCodeService;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PurchaseController extends Controller
 {
@@ -14,6 +16,7 @@ class PurchaseController extends Controller
         return view('purchase.index');
     }
 
+    /*
     public function checkout(Request $request, PayPalService $paypal)
     {
         $request->validate([
@@ -32,15 +35,12 @@ class PurchaseController extends Controller
 
         $amountKes = $quantity * $price;
 
-        /*
-        Temporary USD conversion
-        Replace later with forex API
-        */
+        
 
         $amountUsd = $amountKes / 130;
 
         $purchase = Purchase::create([
-            'user_id' => auth()->id,
+            'user_id' => auth()->id(),
             'quantity' => $quantity,
             'amount' => $amountKes,
             'status' => 'pending'
@@ -64,6 +64,81 @@ class PurchaseController extends Controller
             'paypal' => 'Unable to connect to PayPal.'
         ]);
     }
+    */
+
+    public function checkout(Request $request, PayPalService $paypal)
+{
+    $request->validate([
+        'quantity' => 'required|integer|min:1|max:100'
+    ]);
+
+    $quantity = $request->quantity;
+
+    if ($quantity <= 5) {
+        $price = 2000;
+    } elseif ($quantity <= 20) {
+        $price = 1500;
+    } else {
+        $price = 1000;
+    }
+
+    $amountKes = $quantity * $price;
+
+    /*
+    =========================================================
+    MOCK MODE (ACTIVE NOW - bypass PayPal)
+    =========================================================
+    */
+
+    $purchase = Purchase::create([
+        'user_id' => auth()->id(),
+        'quantity' => $quantity,
+        'amount' => $amountKes,
+        'status' => 'paid' // simulate instant success
+    ]);
+
+    $codes = app(\App\Services\AccessCodeService::class)
+        ->generate($purchase);
+
+    \Illuminate\Support\Facades\Mail::to($purchase->user->email)
+        ->send(new \App\Mail\PurchaseSuccessMail($purchase, $codes));
+
+    return view('purchase.success', [
+        'purchase' => $purchase,
+        'codes' => $codes
+    ]);
+
+    /*
+    =========================================================
+    PAYPAL MODE (DISABLED - DO NOT DELETE)
+    =========================================================
+
+    $amountUsd = $amountKes / 130;
+
+    $purchase = Purchase::create([
+        'user_id' => auth()->id(),
+        'quantity' => $quantity,
+        'amount' => $amountKes,
+        'status' => 'pending'
+    ]);
+
+    $paypalOrder = $paypal->createOrder($amountUsd);
+
+    $purchase->update([
+        'paypal_order_id' => $paypalOrder['id']
+    ]);
+
+    foreach ($paypalOrder['links'] as $link) {
+        if ($link['rel'] === 'approve') {
+            return redirect($link['href']);
+        }
+    }
+
+    return back()->withErrors([
+        'paypal' => 'Unable to connect to PayPal.'
+    ]);
+    */
+}
 
     public function success(
     Request $request,
@@ -96,10 +171,9 @@ class PurchaseController extends Controller
 
         $codes = $codeService->generate($purchase);
 
-        /*
-        NEXT:
-        Send Email
-        */
+        //Send email
+        Mail::to($purchase->user->email)
+            ->send(new PurchaseSuccessMail($purchase,$codes));
 
         return view('purchase.success', [
             'purchase' => $purchase,
