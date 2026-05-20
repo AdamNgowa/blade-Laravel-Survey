@@ -6,35 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Access codes</title>
 </head>
-<body>
-    <h1>Payment Successful</h1>
-    <p>
-        Thank you for your purchase
-    </p>
+<body>    
+    <div style="font-family: Arial, sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #eee; border-radius:10px;">
 
-    <p>
-        Quantity:
-        {{ $purchase->quantity }}
-    </p>
-    <p>
-        Amount: 
-        {{ number_format($purchase->amount) }}
-    </p>
-    <h2>Your access codes</h2>
-    @foreach ($codes as $code )
+    <h1 style="text-align:center; color:#16a34a;">
+        Payment Successful
+    </h1>
 
-    <div>
-        <strong>
-            {{ $code->code }}
-        </strong>
-    </div>
-        
-    @endforeach
+    <p style="text-align:center; color:#555;">
+        Your access codes are ready.
+    </p>
 
     <hr>
-    <p>
-        Each code can only be used once
-    </p>
-    
+
+    <h3>Purchase Summary</h3>
+
+    <p><strong>Quantity:</strong> {{ $purchase->quantity }}</p>
+    <p><strong>Total:</strong> KES {{ number_format($purchase->amount) }}</p>
+    <p><strong>Status:</strong> {{ $purchase->status }}</p>
+
+    <hr>
+
+    <h3>Your Access Codes</h3>
+
+    @foreach($codes as $code)
+        <div style="padding:10px; margin:8px 0; background:#f9f9f9; border:1px solid #ddd; border-radius:6px;">
+            <strong style="font-family:monospace; font-size:16px;">
+                {{ $code->code }}
+            </strong>
+        </div>
+    @endforeach
+
+</div>
 </body>
 </html>

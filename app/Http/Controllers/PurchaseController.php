@@ -97,11 +97,11 @@ class PurchaseController extends Controller
         'status' => 'paid' // simulate instant success
     ]);
 
-    $codes = app(\App\Services\AccessCodeService::class)
+    $codes = app(AccessCodeService::class)
         ->generate($purchase);
 
-    \Illuminate\Support\Facades\Mail::to($purchase->user->email)
-        ->send(new \App\Mail\PurchaseSuccessMail($purchase, $codes));
+    Mail::to($purchase->user->email)
+        ->send(new PurchaseSuccessMail($purchase, $codes));
 
     return view('purchase.success', [
         'purchase' => $purchase,

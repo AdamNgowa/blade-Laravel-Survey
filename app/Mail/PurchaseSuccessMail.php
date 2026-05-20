@@ -26,11 +26,26 @@ class PurchaseSuccessMail extends Mailable
         $this->codes = $codes;
     }
 
-    public function build(){
-        return $this
-        ->subject("Your financial survey access codes")
-        ->view('emails.purchase-success');
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject:'Your Access Codes - Financial Survey'
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.purchase-success',
+            with: [
+                'purchase' => $this->purchase,
+                'codes' => $this->codes,
+            ]
+        );
     }
 
     
+
+    
 }
+ 
