@@ -103,6 +103,7 @@ class PurchaseController extends Controller
     Mail::to($purchase->user->email)
         ->send(new PurchaseSuccessMail($purchase, $codes));
 
+    
     return view('purchase.success', [
         'purchase' => $purchase,
         'codes' => $codes

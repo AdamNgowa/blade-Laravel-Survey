@@ -15,31 +15,45 @@ class SurveyController extends Controller
         return view('survey.welcome');
     }
 
-    public function start(Request $request)
-    {
+    public function start(Request $request){
         $request->validate([
-            'access_code' => 'required'
+            'access_code' => 'required|string'
         ]);
 
-        $code = AccessCode::where('code', $request->access_code)->first();
-
-        if (!$code || $code->is_used) {
+        // Normalize code input
+        $inputCode =  strtoupper(trim($request->access_code));
+        // Find access code
+        $code = AccessCode::where('code',$inputCode)->first();
+        //Invalid code
+        if(!$code){
             return back()->withErrors([
-                'access_code' => 'Invalid or already used access code'
+                'access_code'=>'Access code does not exist.'
+            ]);
+
+        }
+        //Already used
+        if($code->is_used){
+            return back()->withErrors([
+                'access_code' => 'This access code has already been used'
             ]);
         }
 
+        //Create survey attempt
         $attempt = SurveyAttempt::create([
             'access_code_id' => $code->id
         ]);
 
+        //Lock code permanently
         $code->update([
-            'is_used' => true
+            'is_used' => true,
+            'used_at' => now(),
+            'used_by' => auth()->id(),
         ]);
 
+        //Redirect to first question
         return redirect()->route('survey.question', [
             'attempt' => $attempt->id,
-            'index' => 1
+             'index' => 1,
         ]);
     }
 

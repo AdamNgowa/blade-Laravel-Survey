@@ -13,6 +13,10 @@ class SurveyAttempt extends Model
         'completed_at',
     ];
 
+    protected $casts = [
+    'completed_at' => 'datetime'
+    ];
+
     public function accessCode()
     {
         return $this->belongsTo(AccessCode::class);
